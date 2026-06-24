@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: excel-dashboard-no-storage
+    name: mosdotbriut
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
