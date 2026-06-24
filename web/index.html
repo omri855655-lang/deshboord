@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>דשבורד מוסדות והכשרות</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">דשבורד ללא שמירת מידע</p>
+          <h1>מעלים אקסל, מקבלים תמונת מצב מיידית</h1>
+          <p class="lead">
+            הקובץ מעובד בזמן אמת בלבד. הנתונים לא נכתבים למסד נתונים, והדשבורד נבנה מחדש בכל העלאה.
+          </p>
+        </div>
+        <form id="upload-form" class="upload-card">
+          <label class="upload-label" for="excel-input">קובץ אקסל</label>
+          <input id="excel-input" name="excel" type="file" accept=".xlsx,.xls" required />
+          <button type="submit">טעינת דשבורד</button>
+          <p id="upload-status" class="status-text">מומלץ להעלות את הקובץ המעודכן ביותר בכל כניסה.</p>
+        </form>
+      </section>
+
+      <section id="dashboard-shell" class="dashboard-shell hidden">
+        <section class="toolbar">
+          <div class="toolbar-group">
+            <label for="year-filter">שנה</label>
+            <select id="year-filter" multiple></select>
+          </div>
+          <div class="toolbar-group">
+            <label for="academic-filter">מוסד אקדמי</label>
+            <select id="academic-filter" multiple></select>
+          </div>
+          <div class="toolbar-group">
+            <label for="district-filter">מחוז</label>
+            <select id="district-filter" multiple></select>
+          </div>
+          <div class="toolbar-group">
+            <label for="field-filter">תחום הכשרה</label>
+            <select id="field-filter" multiple></select>
+          </div>
+          <div class="toolbar-group">
+            <label for="group-filter">קבוצת יישובים</label>
+            <select id="group-filter" multiple></select>
+          </div>
+          <div class="toolbar-actions">
+            <button id="clear-filters" type="button" class="ghost-button">ניקוי סינונים</button>
+          </div>
+        </section>
+
+        <section class="kpis" id="kpis"></section>
+
+        <section class="grid">
+          <article class="panel">
+            <div class="panel-header">
+              <h2>סיכום אגרגטיבי</h2>
+              <p>התמונה הכללית לפי הסינונים שנבחרו</p>
+            </div>
+            <div id="summary-table"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <h2>לפי מוסדות</h2>
+              <p>מספר סטודנטים מצטבר לפי מוסד אקדמי</p>
+            </div>
+            <div id="institution-chart" class="chart-box"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <h2>לפי אזורים גיאוגרפיים</h2>
+              <p>השוואה בין מחוזות וקבוצות ממשלתיות</p>
+            </div>
+            <div id="district-chart" class="chart-box"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <h2>לפי תחומים</h2>
+              <p>התחומים הפעילים ביותר בדאטה הנבחר</p>
+            </div>
+            <div id="field-chart" class="chart-box"></div>
+          </article>
+
+          <article class="panel panel-wide">
+            <div class="panel-header">
+              <h2>תצוגת מפה</h2>
+              <p>מפה סכמטית לפי עיר או מחוז, על בסיס הנתונים באקסל</p>
+            </div>
+            <div id="map-view" class="map-view"></div>
+          </article>
+
+          <article class="panel panel-wide">
+            <div class="panel-header">
+              <h2>פירוט רשומות</h2>
+              <p>הרשומות המסוננות לצורך בדיקה וייצוא ידני</p>
+            </div>
+            <div id="detail-table"></div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

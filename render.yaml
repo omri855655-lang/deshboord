@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: excel-dashboard-no-storage
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
