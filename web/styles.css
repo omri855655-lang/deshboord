@@ -306,63 +306,27 @@ button {
   font-weight: 800;
 }
 
-.map-view {
-  position: relative;
-  min-height: 560px;
-  overflow: hidden;
+.geo-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 16px;
+}
+
+.geo-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.geo-card {
+  padding: 16px;
   border: 1px solid var(--line);
-  border-radius: 24px;
-  background:
-    radial-gradient(circle at 15% 12%, rgba(255,255,255,0.5), transparent 22%),
-    linear-gradient(180deg, var(--sky), var(--sea));
+  border-radius: 20px;
+  background: var(--paper-strong);
 }
 
-.map-surface {
-  position: relative;
-  width: 100%;
-  min-height: 560px;
-}
-
-.map-base {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center top;
-  padding: 12px;
-}
-
-.map-dot {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  border-radius: 999px;
-  background: rgba(184, 95, 47, 0.86);
-  border: 2px solid rgba(255, 255, 255, 0.78);
-  box-shadow: 0 10px 25px rgba(98, 55, 23, 0.22);
-}
-
-.map-label {
-  position: absolute;
-  transform: translate(-50%, calc(-50% + 24px));
-  background: rgba(255, 253, 247, 0.95);
-  border: 1px solid rgba(22, 35, 31, 0.1);
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 0.84rem;
-  white-space: nowrap;
-  box-shadow: 0 8px 18px rgba(31, 37, 34, 0.08);
-}
-
-.map-legend {
-  position: absolute;
-  left: 18px;
-  bottom: 18px;
-  padding: 12px 14px;
-  border-radius: 18px;
-  background: rgba(255, 250, 242, 0.92);
-  border: 1px solid rgba(22, 35, 31, 0.08);
-  font-size: 0.9rem;
+.geo-card h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
 }
 
 .drilldown-list {

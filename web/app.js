@@ -14,73 +14,6 @@ const filterIds = [
   "group-filter",
 ];
 
-const cityCenters = {
-  "קרית שמונה": { x: 60, y: 11 },
-  "מ.א גליל עליון": { x: 57, y: 16 },
-  "מבואות חרמון": { x: 66, y: 18 },
-  "נהריה": { x: 35, y: 19 },
-  "שלומי": { x: 36, y: 16 },
-  "מעלות תרשיחא": { x: 40, y: 22 },
-  "עכו": { x: 38, y: 27 },
-  "כרמיאל": { x: 48, y: 27 },
-  "שפרעם": { x: 46, y: 31 },
-  "חיפה": { x: 40, y: 34 },
-  "קריות": { x: 40, y: 31 },
-  "קרית מוצקין": { x: 39, y: 30 },
-  "קרית ביאליק": { x: 39, y: 30 },
-  "קרית אתא": { x: 43, y: 31 },
-  "קרית חיים": { x: 38, y: 30 },
-  "טירת הכרמל": { x: 39, y: 36 },
-  "יקנעם": { x: 45, y: 38 },
-  "עפולה": { x: 52, y: 37 },
-  "טבריה": { x: 59, y: 32 },
-  "צפת": { x: 55, y: 24 },
-  "רמת פוריה": { x: 57, y: 35 },
-  "מגדל העמק": { x: 49, y: 35 },
-  "גליל תחתון": { x: 54, y: 34 },
-  "זכרון יעקב": { x: 39, y: 42 },
-  "חדרה": { x: 40, y: 46 },
-  "נתניה": { x: 40, y: 50 },
-  "בארותיים": { x: 41, y: 49 },
-  "רעננה": { x: 42, y: 54 },
-  "כפר סבא": { x: 44, y: 54 },
-  "הוד השרון": { x: 44, y: 55 },
-  "הרצליה": { x: 39, y: 55 },
-  "ראש העין": { x: 46, y: 57 },
-  "פתח תקווה": { x: 45, y: 58 },
-  "בני ברק": { x: 42, y: 59 },
-  "רמת גן": { x: 41, y: 60 },
-  "קרית אונו": { x: 43, y: 60 },
-  "אור יהודה": { x: 43, y: 61 },
-  "תל אביב": { x: 38, y: 60 },
-  "בת ים": { x: 38, y: 62 },
-  "חולון": { x: 39, y: 61 },
-  "ראשון לציון": { x: 39, y: 64 },
-  "יבנה": { x: 39, y: 67 },
-  "רחובות": { x: 42, y: 66 },
-  "נס ציונה": { x: 41, y: 65 },
-  "רמלה": { x: 44, y: 64 },
-  "מודיעין": { x: 49, y: 65 },
-  "ירושלים": { x: 56, y: 66 },
-  "אשדוד": { x: 36, y: 71 },
-  "אשקלון": { x: 35, y: 76 },
-  "קרית מלאכי": { x: 40, y: 71 },
-  "קרית גת": { x: 42, y: 75 },
-  "באר שבע": { x: 49, y: 84 },
-  "בני ציון": { x: 41, y: 52 },
-  "אילת": { x: 50, y: 98 },
-};
-
-const districtCenters = {
-  "צפון": { x: 50, y: 24 },
-  "חיפה": { x: 40, y: 34 },
-  "תל אביב": { x: 40, y: 59 },
-  "מרכז": { x: 45, y: 59 },
-  "ירושלים": { x: 56, y: 66 },
-  "אשקלון": { x: 37, y: 73 },
-  "דרום": { x: 47, y: 84 },
-};
-
 const uploadForm = document.getElementById("upload-form");
 const excelInput = document.getElementById("excel-input");
 const uploadStatus = document.getElementById("upload-status");
@@ -183,7 +116,7 @@ function applyFilters() {
   renderKpis();
   renderSummary();
   renderCharts();
-  renderMap();
+  renderGeoBreakdown();
   renderCityDrilldown();
   renderTable();
 }
@@ -302,51 +235,77 @@ function renderBarChart(targetId, rows, options = {}) {
   `;
 }
 
-function renderMap() {
-  const grouped = groupRows(state.filtered, "city", 14);
-  const target = document.getElementById("map-view");
-  if (!grouped.length) {
-    target.innerHTML = `<div class="empty-state">אין מספיק נתונים למפה.</div>`;
+function renderGeoBreakdown() {
+  const target = document.getElementById("geo-breakdown");
+  const cities = groupRows(state.filtered, "city", 12);
+  const districts = groupRows(state.filtered, "district", 8);
+  const geoGroups = summarizeGeoGroups(state.filtered, state.groups).slice(0, 8);
+
+  if (!cities.length && !districts.length) {
+    target.innerHTML = `<div class="empty-state">אין מספיק נתונים גיאוגרפיים להצגה.</div>`;
     return;
   }
 
-  const max = Math.max(...grouped.map((row) => row.value));
-  const dots = grouped
-    .map((row, index) => {
-      const record = state.filtered.find((item) => item.city === row.label);
-      const point = lookupPoint(row.label, record?.district, index);
-      const size = 10 + (row.value / max) * 24;
-      return `
-        <div class="map-dot" style="left:${point.x}%; top:${point.y}%; width:${size}px; height:${size}px;"></div>
-        <div class="map-label" style="left:${point.x}%; top:${point.y}%;">${escapeHtml(row.label)} · ${row.value}</div>
-      `;
-    })
-    .join("");
-
   target.innerHTML = `
-    <div class="map-surface">
-      <img class="map-base" src="/assets/israel-map.jpg" alt="מפת ישראל" />
-      ${dots}
-      <div class="map-legend">מפת ישראל מלאה עם סימון ערים לפי הנתונים המסוננים בדשבורד.</div>
+    <div class="geo-grid">
+      <div class="geo-stack">
+        <div class="geo-card">
+          <h3>הערים המובילות</h3>
+          ${renderInlineBars(cities, false)}
+        </div>
+        <div class="geo-card">
+          <h3>קבוצות גיאוגרפיות ותכניות</h3>
+          ${renderInlineBars(geoGroups, true)}
+        </div>
+      </div>
+      <div class="geo-card">
+        <h3>מחוזות</h3>
+        ${renderInlineBars(districts, true)}
+      </div>
     </div>
   `;
 }
 
-function lookupPoint(city, district, index) {
-  const normalizedCity = normalizeMapKey(city);
-  if (cityCenters[normalizedCity]) return cityCenters[normalizedCity];
-  const center = districtCenters[district] || { x: 46, y: 56 };
-  return {
-    x: center.x + ((index % 4) - 1.5) * 2.2,
-    y: center.y + ((index % 3) - 1) * 2.5,
-  };
+function summarizeGeoGroups(records, groups) {
+  const labelById = new Map(groups.map((group) => [group.id, group.label]));
+  const totals = new Map();
+
+  records.forEach((record) => {
+    (record.geo_groups || []).forEach((groupId) => {
+      totals.set(groupId, (totals.get(groupId) || 0) + Number(record.students || 0));
+    });
+  });
+
+  return [...totals.entries()]
+    .map(([groupId, value]) => ({
+      label: labelById.get(groupId) || groupId,
+      value,
+    }))
+    .sort((a, b) => b.value - a.value);
 }
 
-function normalizeMapKey(value) {
-  return String(value || "")
-    .replaceAll("קריית", "קרית")
-    .replaceAll("ב\"ש", "באר שבע")
-    .trim();
+function renderInlineBars(rows, alt) {
+  if (!rows.length) {
+    return `<div class="empty-state">אין נתונים רלוונטיים.</div>`;
+  }
+  const max = Math.max(...rows.map((row) => row.value));
+  return `
+    <div class="chart">
+      ${rows
+        .map(
+          (row) => `
+            <div class="chart-row">
+              <div class="chart-label">${escapeHtml(row.label)}</div>
+              <div class="bar-track">
+                <div class="bar-fill ${alt ? "alt" : ""}" style="width:${(row.value / max) * 100}%"></div>
+              </div>
+              <div class="bar-value">${row.value.toLocaleString("he-IL")}</div>
+            </div>
+          `
+        )
+        .join("")}
+    </div>
+  `;
 }
 
 function renderCityDrilldown() {
