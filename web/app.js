@@ -317,29 +317,17 @@ function renderMap() {
       const point = lookupPoint(row.label, record?.district, index);
       const size = 10 + (row.value / max) * 24;
       return `
-        <div class="map-dot" style="right:${point.x}%; top:${point.y}%; width:${size}px; height:${size}px;"></div>
-        <div class="map-label" style="right:${point.x}%; top:${point.y}%;">${escapeHtml(row.label)} · ${row.value}</div>
+        <div class="map-dot" style="left:${point.x}%; top:${point.y}%; width:${size}px; height:${size}px;"></div>
+        <div class="map-label" style="left:${point.x}%; top:${point.y}%;">${escapeHtml(row.label)} · ${row.value}</div>
       `;
     })
     .join("");
 
   target.innerHTML = `
     <div class="map-surface">
-      <svg class="map-svg" viewBox="0 0 260 700" aria-hidden="true">
-        <path d="M156 11
-          L145 38 L153 75 L142 118 L151 156 L144 200 L154 239 L145 279
-          L155 319 L145 365 L154 404 L144 446 L152 487 L141 535 L150 578
-          L130 624 L123 664 L143 690 L126 700 L98 665 L106 626 L94 584
-          L103 546 L90 504 L98 463 L85 420 L94 378 L82 335 L92 294 L83 252
-          L95 211 L86 170 L99 132 L90 90 L104 52 L119 18 Z"
-          fill="#f7f1de"
-          stroke="#69795f"
-          stroke-width="6"
-          stroke-linejoin="round" />
-        <path d="M120 600 L167 654 L152 672 L108 617 Z" fill="#efe2c7" stroke="#69795f" stroke-width="5" stroke-linejoin="round" />
-      </svg>
+      <img class="map-base" src="/assets/israel-map.jpg" alt="מפת ישראל" />
       ${dots}
-      <div class="map-legend">המפה מבוססת על סילואט של ישראל ונקודות ערים מותאמות ידנית לדשבורד.</div>
+      <div class="map-legend">מפת ישראל מלאה עם סימון ערים לפי הנתונים המסוננים בדשבורד.</div>
     </div>
   `;
 }
