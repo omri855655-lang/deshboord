@@ -345,7 +345,7 @@ function renderCityDrilldown() {
                         (child) => `
                           <tr>
                             <td>${escapeHtml(child.label)}</td>
-                            <td>${escapeHtml(child.fieldsSummary)}</td>
+                            <td>${escapeHtml(child.field)}</td>
                             <td>${escapeHtml(child.category)}</td>
                             <td>${escapeHtml(child.subCategory)}</td>
                             <td>${child.value.toLocaleString("he-IL")}</td>
@@ -369,21 +369,20 @@ function groupHierarchyByCity(records) {
   records.forEach((record) => {
     const city = record.city || "ללא נתון";
     const site = record.institution_name || record.training_site || "ללא נתון";
+    const field = record.training_field || "ללא תחום";
     const cityEntry = byCity.get(city) || { city, total: 0, children: new Map() };
     cityEntry.total += Number(record.students || 0);
 
-    const child = cityEntry.children.get(site) || {
+    const childKey = `${site}|||${field}`;
+    const child = cityEntry.children.get(childKey) || {
       label: site,
       value: 0,
+      field,
       category: record.category || "",
       subCategory: record.sub_category || "",
-      fields: new Set(),
     };
     child.value += Number(record.students || 0);
-    if (record.training_field) {
-      child.fields.add(record.training_field);
-    }
-    cityEntry.children.set(site, child);
+    cityEntry.children.set(childKey, child);
     byCity.set(city, cityEntry);
   });
 
@@ -392,10 +391,6 @@ function groupHierarchyByCity(records) {
       city: entry.city,
       total: entry.total,
       children: [...entry.children.values()]
-        .map((child) => ({
-          ...child,
-          fieldsSummary: [...child.fields].sort((a, b) => a.localeCompare(b, "he")).join(", "),
-        }))
         .sort((a, b) => b.value - a.value),
     }))
     .sort((a, b) => b.total - a.total);
