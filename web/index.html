@@ -9,11 +9,12 @@
   <body>
     <main class="page-shell">
       <section class="hero">
-        <div>
-          <p class="eyebrow">דשבורד ללא שמירת מידע</p>
-          <h1>מעלים אקסל, מקבלים תמונת מצב מיידית</h1>
+        <div class="hero-copy">
+          <p class="eyebrow">Mosdot Briut Dashboard</p>
+          <h1>דשבורד מוסדות בריאות שמרגיש כמו כלי עבודה אמיתי</h1>
           <p class="lead">
-            הקובץ מעובד בזמן אמת בלבד. הנתונים לא נכתבים למסד נתונים, והדשבורד נבנה מחדש בכל העלאה.
+            מעלים את האקסל המעודכן, וכל הדשבורד נבנה מחדש בלי שמירת מידע קבועה: חיתוכים לפי מוסד, מחוז,
+            תחום, סיווג, תכניות ממשלתיות ומבט גיאוגרפי מלא.
           </p>
         </div>
         <form id="upload-form" class="upload-card">
@@ -43,6 +44,14 @@
             <select id="field-filter" multiple></select>
           </div>
           <div class="toolbar-group">
+            <label for="category-filter">סיווג</label>
+            <select id="category-filter" multiple></select>
+          </div>
+          <div class="toolbar-group">
+            <label for="subcategory-filter">תת סיווג</label>
+            <select id="subcategory-filter" multiple></select>
+          </div>
+          <div class="toolbar-group">
             <label for="group-filter">קבוצת יישובים</label>
             <select id="group-filter" multiple></select>
           </div>
@@ -53,54 +62,98 @@
 
         <section class="kpis" id="kpis"></section>
 
-        <section class="grid">
-          <article class="panel">
-            <div class="panel-header">
-              <h2>סיכום אגרגטיבי</h2>
-              <p>התמונה הכללית לפי הסינונים שנבחרו</p>
-            </div>
-            <div id="summary-table"></div>
-          </article>
+        <section class="content-layout">
+          <div class="main-column">
+            <article class="panel panel-hero">
+              <div class="panel-header">
+                <h2>סיכום אגרגטיבי</h2>
+                <p>תמונת מצב מרכזית לפי כל הסננים שנבחרו</p>
+              </div>
+              <div id="summary-table"></div>
+            </article>
 
-          <article class="panel">
-            <div class="panel-header">
-              <h2>לפי מוסדות</h2>
-              <p>מספר סטודנטים מצטבר לפי מוסד אקדמי</p>
-            </div>
-            <div id="institution-chart" class="chart-box"></div>
-          </article>
+            <article class="panel panel-wide">
+              <div class="panel-header">
+                <h2>לפי מוסדות אקדמיים</h2>
+                <p>שיקוף של המבט הראשי באקסל לפי מוסד אקדמי</p>
+              </div>
+              <div id="institution-chart" class="chart-box"></div>
+            </article>
 
-          <article class="panel">
-            <div class="panel-header">
-              <h2>לפי אזורים גיאוגרפיים</h2>
-              <p>השוואה בין מחוזות וקבוצות ממשלתיות</p>
-            </div>
-            <div id="district-chart" class="chart-box"></div>
-          </article>
+            <article class="panel panel-wide">
+              <div class="panel-header">
+                <h2>לפי אזורים גיאוגרפיים</h2>
+                <p>מחוזות, ערים וקבוצות ממשלתיות באותו מבט</p>
+              </div>
+              <div id="district-chart" class="chart-box"></div>
+            </article>
 
-          <article class="panel">
-            <div class="panel-header">
-              <h2>לפי תחומים</h2>
-              <p>התחומים הפעילים ביותר בדאטה הנבחר</p>
-            </div>
-            <div id="field-chart" class="chart-box"></div>
-          </article>
+            <article class="panel panel-wide">
+              <div class="panel-header">
+                <h2>מפת ישראל</h2>
+                <p>פריסה גיאוגרפית על גבי סילואט של ישראל, עם פיזור ערים אמיתי ככל האפשר</p>
+              </div>
+              <div id="map-view" class="map-view"></div>
+            </article>
 
-          <article class="panel panel-wide">
-            <div class="panel-header">
-              <h2>תצוגת מפה</h2>
-              <p>מפה סכמטית לפי עיר או מחוז, על בסיס הנתונים באקסל</p>
-            </div>
-            <div id="map-view" class="map-view"></div>
-          </article>
+            <article class="panel panel-wide">
+              <div class="panel-header">
+                <h2>עיר ואז מוסדות / בתי חולים / מרכזים רפואיים</h2>
+                <p>מנגנון פתיחה היררכי שמחקה את היכולת לפתוח עיר ולראות את כל הגופים בתוכה</p>
+              </div>
+              <div id="city-drilldown"></div>
+            </article>
 
-          <article class="panel panel-wide">
-            <div class="panel-header">
-              <h2>פירוט רשומות</h2>
-              <p>הרשומות המסוננות לצורך בדיקה וייצוא ידני</p>
-            </div>
-            <div id="detail-table"></div>
-          </article>
+            <article class="panel panel-wide">
+              <div class="panel-header">
+                <h2>פירוט רשומות</h2>
+                <p>הרשומות המסוננות לצורך בדיקה ותיקוף מול האקסל</p>
+              </div>
+              <div id="detail-table"></div>
+            </article>
+          </div>
+
+          <aside class="side-column">
+            <article class="panel side-panel">
+              <div class="panel-header">
+                <h2>לפי תחומים</h2>
+                <p>התחומים הפעילים ביותר</p>
+              </div>
+              <div id="field-chart" class="chart-box compact-chart"></div>
+            </article>
+
+            <article class="panel side-panel">
+              <div class="panel-header">
+                <h2>לפי סיווג</h2>
+                <p>בית חולים, מכון, ילדים ומוסד שיקום</p>
+              </div>
+              <div id="category-chart" class="chart-box compact-chart"></div>
+            </article>
+
+            <article class="panel side-panel">
+              <div class="panel-header">
+                <h2>לפי תת סיווג</h2>
+                <p>כלל הסיווגים המפורטים בקובץ</p>
+              </div>
+              <div id="subcategory-chart" class="chart-box compact-chart"></div>
+            </article>
+
+            <article class="panel side-panel">
+              <div class="panel-header">
+                <h2>הערים המובילות</h2>
+                <p>המקבילה המשודרגת ל-PIVOT2</p>
+              </div>
+              <div id="city-chart" class="chart-box compact-chart"></div>
+            </article>
+
+            <article class="panel side-panel">
+              <div class="panel-header">
+                <h2>מוסדות הכשרה מובילים</h2>
+                <p>בתי חולים, מכונים ומרכזים לפי היקף פעילות</p>
+              </div>
+              <div id="site-chart" class="chart-box compact-chart"></div>
+            </article>
+          </aside>
         </section>
       </section>
     </main>
