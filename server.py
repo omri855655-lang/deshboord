@@ -4,6 +4,8 @@ import io
 import json
 import os
 import re
+from email import policy
+from email.parser import BytesParser
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -11,7 +13,6 @@ from typing import Any
 from urllib.parse import urlparse
 
 import pandas as pd
-from cgi import FieldStorage
 
 
 ROOT = Path(__file__).resolve().parent
@@ -162,6 +163,29 @@ def json_response(handler: SimpleHTTPRequestHandler, payload: dict[str, Any], st
     handler.wfile.write(body)
 
 
+def parse_multipart_file(handler: SimpleHTTPRequestHandler, field_name: str) -> bytes:
+    content_length = int(handler.headers.get("Content-Length", "0"))
+    content_type = handler.headers.get("Content-Type", "")
+    if not content_length or "multipart/form-data" not in content_type:
+        raise ValueError("Expected multipart/form-data")
+
+    raw_body = handler.rfile.read(content_length)
+    parser = BytesParser(policy=policy.default)
+    message = parser.parsebytes(
+        b"Content-Type: " + content_type.encode("utf-8") + b"\r\n\r\n" + raw_body
+    )
+
+    for part in message.iter_parts():
+        if part.get_param("name", header="content-disposition") != field_name:
+            continue
+        payload = part.get_payload(decode=True)
+        if payload is None:
+            raise ValueError("לא התקבל תוכן בקובץ")
+        return payload
+
+    raise ValueError("לא התקבל קובץ אקסל")
+
+
 class DashboardHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, directory=str(STATIC_DIR), **kwargs)
@@ -179,26 +203,9 @@ class DashboardHandler(SimpleHTTPRequestHandler):
             json_response(self, {"error": "Unsupported endpoint"}, HTTPStatus.NOT_FOUND)
             return
 
-        content_type = self.headers.get("Content-Type", "")
-        if "multipart/form-data" not in content_type:
-            json_response(self, {"error": "Expected multipart/form-data"}, HTTPStatus.BAD_REQUEST)
-            return
-
-        form = FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={
-                "REQUEST_METHOD": "POST",
-                "CONTENT_TYPE": content_type,
-            },
-        )
-        upload = form["excel"] if "excel" in form else None
-        if upload is None or not getattr(upload, "file", None):
-            json_response(self, {"error": "לא התקבל קובץ אקסל"}, HTTPStatus.BAD_REQUEST)
-            return
-
         try:
-            payload = parse_excel(upload.file.read())
+            upload_bytes = parse_multipart_file(self, "excel")
+            payload = parse_excel(upload_bytes)
         except Exception as exc:  # noqa: BLE001
             json_response(self, {"error": str(exc)}, HTTPStatus.BAD_REQUEST)
             return
