@@ -374,6 +374,7 @@ function renderCityDrilldown() {
                   <thead>
                     <tr>
                       <th>מוסד / מרכז רפואי</th>
+                      <th>תחום התמחות</th>
                       <th>סיווג</th>
                       <th>תת סיווג</th>
                       <th>סה"כ סטודנטים</th>
@@ -385,6 +386,7 @@ function renderCityDrilldown() {
                         (child) => `
                           <tr>
                             <td>${escapeHtml(child.label)}</td>
+                            <td>${escapeHtml(child.fieldsSummary)}</td>
                             <td>${escapeHtml(child.category)}</td>
                             <td>${escapeHtml(child.subCategory)}</td>
                             <td>${child.value.toLocaleString("he-IL")}</td>
@@ -416,8 +418,12 @@ function groupHierarchyByCity(records) {
       value: 0,
       category: record.category || "",
       subCategory: record.sub_category || "",
+      fields: new Set(),
     };
     child.value += Number(record.students || 0);
+    if (record.training_field) {
+      child.fields.add(record.training_field);
+    }
     cityEntry.children.set(site, child);
     byCity.set(city, cityEntry);
   });
@@ -426,7 +432,12 @@ function groupHierarchyByCity(records) {
     .map((entry) => ({
       city: entry.city,
       total: entry.total,
-      children: [...entry.children.values()].sort((a, b) => b.value - a.value),
+      children: [...entry.children.values()]
+        .map((child) => ({
+          ...child,
+          fieldsSummary: [...child.fields].sort((a, b) => a.localeCompare(b, "he")).join(", "),
+        }))
+        .sort((a, b) => b.value - a.value),
     }))
     .sort((a, b) => b.total - a.total);
 }
